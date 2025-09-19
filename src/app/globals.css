@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-risk-conservative: #16a34a;
+  --color-risk-balanced: #3b82f6;
+  --color-risk-aggressive: #ef4444;
+  --color-risk-custom: #6b7280;
+  --font-sans: "Inter", "system-ui", "sans-serif";
+}
+
+/* Let Tailwind handle the theming */
+
+/* Remove the body styles since we're handling them in the layout */
