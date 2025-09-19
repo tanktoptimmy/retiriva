@@ -115,7 +115,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
         <div className="text-center">
           <div className="text-6xl mb-6">✨</div>
           <p className="text-lg mb-6 text-gray-600 dark:text-gray-300">
-            Once you fill out the calculator, you'll receive:
+            Once you fill out the calculator, you&apos;ll receive:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto text-left">
             {[
