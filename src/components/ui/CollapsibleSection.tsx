@@ -56,7 +56,7 @@ export default function CollapsibleSection({
         isOpen ? 'max-h-none opacity-100' : 'max-h-0 opacity-0'
       }`}>
         <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
-          <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="pt-4 grid grid-cols-1 gap-6">
             {children}
           </div>
         </div>

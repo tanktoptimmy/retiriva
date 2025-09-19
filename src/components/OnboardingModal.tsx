@@ -61,21 +61,21 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             Get personalized projections in just 2 minutes.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+            <div className="p-3 md:p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
               <div className="text-2xl mb-2">🎯</div>
               <h3 className="font-semibold mb-1">Know Your Number</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 Find out exactly how much you need to retire comfortably
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+            <div className="p-3 md:p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
               <div className="text-2xl mb-2">📈</div>
               <h3 className="font-semibold mb-1">See Your Growth</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 Visualize how your investments will compound over decades
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+            <div className="p-3 md:p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
               <div className="text-2xl mb-2">⏰</div>
               <h3 className="font-semibold mb-1">Track Progress</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -94,7 +94,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="p-4 rounded-lg shadow-sm bg-white/80 border border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+                className="p-3 md:p-4 rounded-lg shadow-sm bg-white/80 border border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
               >
                 <div className="text-2xl mb-3">{feature.icon}</div>
                 <h3 className="font-semibold text-base mb-2 text-gray-800 dark:text-gray-100">
@@ -126,12 +126,12 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
               "✅ Detailed year-by-year projections",
               "✅ Coffee vs investment insights",
             ].map((benefit, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+              <div key={index} className="flex items-center gap-3 p-2 md:p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
                 <span className="font-medium text-gray-700 dark:text-gray-200">{benefit}</span>
               </div>
             ))}
           </div>
-          <div className="mt-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
+          <div className="mt-6 p-3 md:p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
               <strong>Quick Start:</strong> The calculator remembers your data, so you can refine your inputs and see updated results instantly.
             </p>
