@@ -22,9 +22,11 @@ const STORAGE_KEY = 'retirement-calculator-data';
 const loadFromStorage = (): SimpleRetirementInput | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
+    console.log('Raw localStorage string:', stored);
     if (!stored) return null;
     
     const data = JSON.parse(stored);
+    console.log('Parsed localStorage data:', data);
     // Convert string back to date
     if (data.dateOfBirth) {
       data.dateOfBirth = new Date(data.dateOfBirth);
@@ -44,24 +46,57 @@ export default function RetirementCalculator() {
   const [hasCalculatedOnce, setHasCalculatedOnce] = useState(false);
   const [justCalculated, setJustCalculated] = useState(false);
 
-  // Auto-calculate on mount if saved data exists
+  // Auto-calculate on mount if saved data exists - but delay to avoid race condition with form loading
   useEffect(() => {
-    const savedData = loadFromStorage();
-    if (savedData) {
-      // Automatically calculate results from saved data
-      try {
-        const result = calculateSimpleRetirement(savedData);
-        const comparison = compareCoffeeVsInvestment(savedData);
+    // Use a small delay to ensure the form has finished loading and updating localStorage
+    const timer = setTimeout(() => {
+      const savedData = loadFromStorage();
+      if (savedData) {
+        // Automatically calculate results from saved data
+        try {
+        // Apply the same data processing that the form hook does
+        const processedData: SimpleRetirementInput = {
+          ...savedData,
+          currentSavings: savedData.currentSavings ?? 50000,
+          monthlySavings: savedData.monthlySavings ?? 800,
+          savingsStopAge: savedData.savingsStopAge ?? 65,
+          deathAge: savedData.deathAge ?? 85,
+          desiredAnnualIncome: savedData.desiredAnnualIncome ?? 35000,
+          inflationRate: savedData.inflationRate ?? 2.5,
+          expectedReturn: savedData.expectedReturn ?? 5.0,
+          statePensionAge: savedData.statePensionAge ?? 67,
+          statePensionPercentage: savedData.statePensionPercentage ?? 100,
+          dailyExpenseAmount: savedData.dailyExpenseAmount ?? 0, // Use ?? instead of || to preserve 0 values
+          workingDaysPerWeek: savedData.workingDaysPerWeek ?? 5,
+          vacationDaysPerYear: savedData.vacationDaysPerYear ?? 0,
+          adjustSavingsForInflation: savedData.adjustSavingsForInflation ?? true,
+        };
+        
+        console.log('=== AUTO-CALCULATION DEBUG ===');
+        console.log('Raw saved data:', savedData);
+        console.log('Raw saved data - dailyExpenseAmount:', savedData.dailyExpenseAmount, typeof savedData.dailyExpenseAmount);
+        console.log('Raw saved data - workingDaysPerWeek:', savedData.workingDaysPerWeek, typeof savedData.workingDaysPerWeek);
+        console.log('Raw saved data - vacationDaysPerYear:', savedData.vacationDaysPerYear, typeof savedData.vacationDaysPerYear);
+        console.log('Processed data - dailyExpenseAmount:', processedData.dailyExpenseAmount);
+        console.log('Processed data - workingDaysPerWeek:', processedData.workingDaysPerWeek);
+        console.log('Processed data - vacationDaysPerYear:', processedData.vacationDaysPerYear);
+        console.log('==============================');
+        
+        const result = calculateSimpleRetirement(processedData);
+        const comparison = compareCoffeeVsInvestment(processedData);
         
         setResults(result);
         setCoffeeComparison(comparison);
         setHasCalculatedOnce(true);
-      } catch (err) {
-        console.error("Auto-calculation error:", err);
-        // Don't set error state for auto-calculation failures
-        // User can still manually submit the form
+        } catch (err) {
+          console.error("Auto-calculation error:", err);
+          // Don't set error state for auto-calculation failures
+          // User can still manually submit the form
+        }
       }
-    }
+    }, 1000); // Wait 1 second for form to stabilize
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSubmit = async (formData: SimpleRetirementInput) => {

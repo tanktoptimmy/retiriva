@@ -152,13 +152,33 @@ export default function CoffeeVsInvestmentAnalysis({
           )}
         </div>
 
-        {comparison.impact.retirementAgeImprovement <= 0 && (
-          <div className="p-3 rounded-lg bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-200">
+        {comparison.impact.retirementAgeImprovement <= 0 && comparison.impact.totalSavingsImprovement !== 0 && (
+          <div className={`p-3 rounded-lg ${
+            comparison.impact.totalSavingsImprovement > 0 
+              ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-200'
+              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-200'
+          }`}>
             <p className="font-semibold flex items-center gap-2">
-              📈 <span>Analysis:</span>
+              {comparison.impact.totalSavingsImprovement > 0 ? '📈' : '⚠️'} <span>Analysis:</span>
             </p>
             <p className="mt-1">
-              While this daily expense doesn&apos;t change your retirement age significantly, investing that money would still give you <strong>{formatCurrencyWithSymbol(comparison.impact.totalSavingsImprovement, regionalConfig.currency)}</strong> more in your retirement fund.
+              {comparison.impact.totalSavingsImprovement > 0 ? (
+                <>While this daily expense doesn&apos;t change your retirement age significantly, investing that money would still give you <strong>{formatCurrencyWithSymbol(comparison.impact.totalSavingsImprovement, regionalConfig.currency)}</strong> more in your retirement fund.</>
+              ) : (
+                <>This daily expense has a minimal impact on your retirement savings. The difference is <strong>{formatCurrencyWithSymbol(Math.abs(comparison.impact.totalSavingsImprovement), regionalConfig.currency)}</strong>, which suggests your current plan is already well-optimized.</>
+              )}
+            </p>
+          </div>
+        )}
+        
+        {/* Show a different message when the impact is truly negligible */}
+        {comparison.impact.retirementAgeImprovement <= 0 && Math.abs(comparison.impact.totalSavingsImprovement) < 100 && (
+          <div className="p-3 rounded-lg bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-200">
+            <p className="font-semibold flex items-center gap-2">
+              ✨ <span>Great News:</span>
+            </p>
+            <p className="mt-1">
+              This daily expense has virtually no impact on your retirement plan. The difference is less than {formatCurrencyWithSymbol(100, regionalConfig.currency)}, so you can enjoy your daily treats guilt-free!
             </p>
           </div>
         )}

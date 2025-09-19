@@ -99,6 +99,10 @@ export const useRetirementForm = ({ onSubmit, onRegionChange, hasCalculatedOnce 
   // Save form values to localStorage
   useEffect(() => {
     if (formValues.dateOfBirth) {
+      console.log('=== FORM VALUES SAVE DEBUG ===');
+      console.log('Raw form values from watch:', formValues);
+      console.log('Raw dailyExpenseAmount:', formValues.dailyExpenseAmount, typeof formValues.dailyExpenseAmount);
+      
       const currentFormData: SimpleRetirementInput = {
         ...formValues,
         currentSavings: formValues.currentSavings ?? 50000,
@@ -110,11 +114,15 @@ export const useRetirementForm = ({ onSubmit, onRegionChange, hasCalculatedOnce 
         expectedReturn: formValues.expectedReturn ?? 5.0,
         statePensionAge: formValues.statePensionAge ?? 67,
         statePensionPercentage: formValues.statePensionPercentage ?? 100,
-        dailyExpenseAmount: formValues.dailyExpenseAmount || 0,
-        workingDaysPerWeek: formValues.workingDaysPerWeek || 5,
-        vacationDaysPerYear: formValues.vacationDaysPerYear || 0,
+        dailyExpenseAmount: formValues.dailyExpenseAmount ?? 0,
+        workingDaysPerWeek: formValues.workingDaysPerWeek ?? 5,
+        vacationDaysPerYear: formValues.vacationDaysPerYear ?? 0,
         adjustSavingsForInflation: formValues.adjustSavingsForInflation ?? true,
       };
+      
+      console.log('Processed form data to save:', currentFormData);
+      console.log('Processed dailyExpenseAmount:', currentFormData.dailyExpenseAmount);
+      console.log('============================');
 
       saveToStorage(currentFormData);
     }
@@ -208,9 +216,9 @@ export const useRetirementForm = ({ onSubmit, onRegionChange, hasCalculatedOnce 
       expectedReturn: formValues.expectedReturn ?? 5.0,
       statePensionAge: formValues.statePensionAge ?? 67,
       statePensionPercentage: formValues.statePensionPercentage ?? 100,
-      dailyExpenseAmount: formValues.dailyExpenseAmount || 0,
-      workingDaysPerWeek: formValues.workingDaysPerWeek || 5,
-      vacationDaysPerYear: formValues.vacationDaysPerYear || 0,
+      dailyExpenseAmount: formValues.dailyExpenseAmount ?? 0,
+      workingDaysPerWeek: formValues.workingDaysPerWeek ?? 5,
+      vacationDaysPerYear: formValues.vacationDaysPerYear ?? 0,
       adjustSavingsForInflation: formValues.adjustSavingsForInflation ?? true,
     };
     
@@ -237,6 +245,13 @@ export const useRetirementForm = ({ onSubmit, onRegionChange, hasCalculatedOnce 
   };
 
   const handleFormSubmit = (data: SimpleRetirementInput) => {
+    console.log('=== FORM SUBMIT DEBUG ===');
+    console.log('Raw form data received:', data);
+    console.log('Daily expense amount:', data.dailyExpenseAmount, typeof data.dailyExpenseAmount);
+    console.log('Working days per week:', data.workingDaysPerWeek, typeof data.workingDaysPerWeek);
+    console.log('Vacation days per year:', data.vacationDaysPerYear, typeof data.vacationDaysPerYear);
+    console.log('========================');
+    
     saveToStorage(data);
     setLastCalculatedValues({ ...data }); // Store a copy of submitted values
     onSubmit(data);

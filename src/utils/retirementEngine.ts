@@ -567,21 +567,56 @@ export function calculateSimpleRetirement(input: SimpleRetirementInput): SimpleR
 export function compareCoffeeVsInvestment(
   input: SimpleRetirementInput
 ): CoffeeVsInvestmentComparison | null {
-  // Ensure we have the required coffee expense fields
-  if (!input.dailyExpenseAmount || !input.workingDaysPerWeek) {
+  // Ensure we have the required coffee expense fields  
+  // Allow dailyExpenseAmount to be 0 (no coffee) but require workingDaysPerWeek
+  if (input.dailyExpenseAmount === undefined || input.dailyExpenseAmount === null || !input.workingDaysPerWeek) {
     return null;
   }
+  
+  // If daily expense is 0, still show analysis but it will show no impact
+  if (input.dailyExpenseAmount === 0) {
+    console.log('=== COFFEE VS INVESTMENT ANALYSIS START (zero expense) ===');
+    console.log('Daily expense is 0 - will show no impact analysis');
+    
+    // Calculate once since both scenarios are identical
+    const baseResult = calculateSimpleRetirement(input);
+    
+    return {
+      withCoffee: baseResult,
+      withoutCoffee: baseResult, // Same result since no coffee expense
+      impact: {
+        retirementAgeImprovement: 0,
+        retirementDateImprovement: 0,
+        totalSavingsImprovement: 0,
+        annualCoffeeSpending: 0,
+        yearsOfCoffeeSpending: 0,
+        totalCoffeeSpendingUntilRetirement: 0,
+      },
+    };
+  }
+
+  console.log('=== COFFEE VS INVESTMENT ANALYSIS START ===');
+  console.log('Input daily expense:', input.dailyExpenseAmount);
+  console.log('Working days per week:', input.workingDaysPerWeek);
+  console.log('Vacation days per year:', input.vacationDaysPerYear);
 
   // Calculate scenario with coffee expenses
+  console.log('\n--- Calculating WITH coffee scenario ---');
   const withCoffee = calculateSimpleRetirement(input);
+  console.log('With coffee - Retirement age:', withCoffee.canRetireAt);
+  console.log('With coffee - Total savings at retirement:', withCoffee.totalSavingsAtRetirement);
   
   // Calculate scenario without coffee expenses (invested instead)
   const inputWithoutCoffee: SimpleRetirementInput = {
     ...input,
-    dailyExpenseAmount: input.dailyExpenseAmount ? -input.dailyExpenseAmount : undefined, // Negative means investment
+    dailyExpenseAmount: -input.dailyExpenseAmount, // Negative means investment
     workingDaysPerWeek: input.workingDaysPerWeek,
   };
+  console.log('\n--- Calculating WITHOUT coffee scenario (investing instead) ---');
+  console.log('Modified daily expense amount (negative = investment):', inputWithoutCoffee.dailyExpenseAmount);
   const withoutCoffee = calculateSimpleRetirement(inputWithoutCoffee);
+  console.log('Without coffee - Retirement age:', withoutCoffee.canRetireAt);
+  console.log('Without coffee - Total savings at retirement:', withoutCoffee.totalSavingsAtRetirement);
   
   // Calculate the impact
   const today = startOfDay(new Date());
@@ -595,10 +630,22 @@ export function compareCoffeeVsInvestment(
   const actualAnnualExpenseDays = Math.max(0, baseAnnualExpenseDays - vacationDays);
   const annualCoffeeSpending = dailyExpense * actualAnnualExpenseDays;
   
+  console.log('\n--- Expense calculations ---');
+  console.log('Working days per week:', workingDaysPerWeek);
+  console.log('Vacation days per year:', vacationDays);
+  console.log('Base annual expense days:', baseAnnualExpenseDays);
+  console.log('Actual annual expense days:', actualAnnualExpenseDays);
+  console.log('Annual coffee spending:', annualCoffeeSpending);
+  
   // Calculate years of coffee spending (until retirement age with coffee or savings stop age)
   const retirementAge = withCoffee.canRetireAt ?? input.savingsStopAge;
   const yearsOfCoffeeSpending = Math.max(0, retirementAge - currentAge);
   const totalCoffeeSpendingUntilRetirement = annualCoffeeSpending * yearsOfCoffeeSpending;
+  
+  console.log('Current age:', currentAge);
+  console.log('Retirement age for calculations:', retirementAge);
+  console.log('Years of coffee spending:', yearsOfCoffeeSpending);
+  console.log('Total coffee spending until retirement:', totalCoffeeSpendingUntilRetirement);
   
   // Calculate improvements (without coffee should allow earlier retirement)
   // If withCoffee.canRetireAt = 67 and withoutCoffee.canRetireAt = 66, improvement = 67 - 66 = 1 year
@@ -612,6 +659,13 @@ export function compareCoffeeVsInvestment(
     : 0;
   
   const totalSavingsImprovement = withoutCoffee.totalSavingsAtRetirement - withCoffee.totalSavingsAtRetirement;
+  
+  console.log('\n--- Impact calculations ---');
+  console.log('Retirement age improvement:', retirementAgeImprovement, 'years');
+  console.log('Retirement date improvement:', retirementDateImprovement, 'days');
+  console.log('Total savings improvement:', totalSavingsImprovement);
+  console.log('Raw calculation: WITHOUT coffee savings:', withoutCoffee.totalSavingsAtRetirement, '- WITH coffee savings:', withCoffee.totalSavingsAtRetirement);
+  console.log('=== COFFEE VS INVESTMENT ANALYSIS END ===\n');
   
   return {
     withCoffee,
