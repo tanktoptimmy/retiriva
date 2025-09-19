@@ -12,9 +12,10 @@ import { useRegionalDefaults } from "./useRegionalDefaults";
 interface UseRetirementFormProps {
   onSubmit: (data: SimpleRetirementInput) => void;
   onRegionChange?: () => void;
+  hasCalculatedOnce?: boolean;
 }
 
-export const useRetirementForm = ({ onSubmit, onRegionChange }: UseRetirementFormProps) => {
+export const useRetirementForm = ({ onSubmit, onRegionChange, hasCalculatedOnce }: UseRetirementFormProps) => {
   const { saveToStorage, loadFromStorage } = useLocalStorage();
   
   // State
@@ -22,6 +23,7 @@ export const useRetirementForm = ({ onSubmit, onRegionChange }: UseRetirementFor
   const [storedData, setStoredData] = useState<Partial<SimpleRetirementInput> | null>(null);
   const [emptyFields, setEmptyFields] = useState<Set<string>>(new Set());
   const [rawInputValues, setRawInputValues] = useState<Record<string, string>>({});
+  const [lastCalculatedValues, setLastCalculatedValues] = useState<SimpleRetirementInput | null>(null);
 
   // Default values
   const defaultDateOfBirth = new Date(1990, 0, 1);
@@ -188,10 +190,64 @@ export const useRetirementForm = ({ onSubmit, onRegionChange }: UseRetirementFor
     return age;
   };
 
+  // Check if form values have changed since last calculation
+  const hasFormChanged = () => {
+    if (!hasCalculatedOnce || !lastCalculatedValues) {
+      return false; // First calculation, no changes to detect
+    }
+    
+    // Compare current form values with last calculated values
+    const currentFormData: SimpleRetirementInput = {
+      ...formValues,
+      currentSavings: formValues.currentSavings ?? 50000,
+      monthlySavings: formValues.monthlySavings ?? 800,
+      savingsStopAge: formValues.savingsStopAge ?? 65,
+      deathAge: formValues.deathAge ?? 85,
+      desiredAnnualIncome: formValues.desiredAnnualIncome ?? 35000,
+      inflationRate: formValues.inflationRate ?? 2.5,
+      expectedReturn: formValues.expectedReturn ?? 5.0,
+      statePensionAge: formValues.statePensionAge ?? 67,
+      statePensionPercentage: formValues.statePensionPercentage ?? 100,
+      dailyExpenseAmount: formValues.dailyExpenseAmount || 0,
+      workingDaysPerWeek: formValues.workingDaysPerWeek || 5,
+      vacationDaysPerYear: formValues.vacationDaysPerYear || 0,
+      adjustSavingsForInflation: formValues.adjustSavingsForInflation ?? true,
+    };
+    
+    // Compare key fields (excluding dateOfBirth since it's a Date object)
+    const fieldsToCompare: (keyof SimpleRetirementInput)[] = [
+      'currentSavings', 'monthlySavings', 'savingsStopAge', 'deathAge',
+      'desiredAnnualIncome', 'inflationRate', 'expectedReturn', 'region',
+      'statePensionAge', 'statePensionPercentage', 'dailyExpenseAmount',
+      'workingDaysPerWeek', 'vacationDaysPerYear', 'adjustSavingsForInflation'
+    ];
+    
+    for (const field of fieldsToCompare) {
+      if (currentFormData[field] !== lastCalculatedValues[field]) {
+        return true;
+      }
+    }
+    
+    // Special handling for dateOfBirth comparison
+    if (currentFormData.dateOfBirth?.getTime() !== lastCalculatedValues.dateOfBirth?.getTime()) {
+      return true;
+    }
+    
+    return false;
+  };
+
   const handleFormSubmit = (data: SimpleRetirementInput) => {
     saveToStorage(data);
+    setLastCalculatedValues({ ...data }); // Store a copy of submitted values
     onSubmit(data);
   };
+
+  // Set last calculated values on initial load if we have calculated before
+  useEffect(() => {
+    if (hasCalculatedOnce && storedData && !lastCalculatedValues) {
+      setLastCalculatedValues({ ...getDefaultValues(), ...storedData } as SimpleRetirementInput);
+    }
+  }, [hasCalculatedOnce, storedData, lastCalculatedValues]);
 
   return {
     // Form methods
@@ -205,6 +261,9 @@ export const useRetirementForm = ({ onSubmit, onRegionChange }: UseRetirementFor
     emptyFields,
     setEmptyFields,
     setRawInputValues,
+    
+    // Form change detection
+    hasFormChanged: hasFormChanged(),
     
     // Utility functions
     handleNumberInput,

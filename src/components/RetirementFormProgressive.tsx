@@ -15,6 +15,7 @@ interface RetirementFormProgressiveProps {
   onSubmit: (data: SimpleRetirementInput) => void;
   hasCalculatedOnce?: boolean;
   onRegionChange?: () => void;
+  loading?: boolean;
 }
 
 
@@ -22,13 +23,12 @@ export default function RetirementFormProgressive({
   onSubmit,
   hasCalculatedOnce,
   onRegionChange,
+  loading = false,
 }: RetirementFormProgressiveProps) {
   
   useEffect(() => {
   }, []);
   
-  // Use resolved theme to determine dark mode, fallback to false during SSR
-
   // Use the custom form hook
   const {
     control,
@@ -41,7 +41,8 @@ export default function RetirementFormProgressive({
     getDisplayValue,
     calculateCurrentAge,
     defaultDateOfBirth,
-  } = useRetirementForm({ onSubmit, onRegionChange });
+    hasFormChanged,
+  } = useRetirementForm({ onSubmit, onRegionChange, hasCalculatedOnce });
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -113,13 +114,30 @@ export default function RetirementFormProgressive({
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 ✓ Your values are automatically saved
               </p>
+              {hasCalculatedOnce && !hasFormChanged && !loading && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  No changes detected
+                </p>
+              )}
+              {hasCalculatedOnce && hasFormChanged && !loading && (
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  ✓ Changes detected
+                </p>
+              )}
             </div>
             <Button
               type="submit"
               className="w-full py-3 text-lg"
-              
+              loading={loading}
+              disabled={hasCalculatedOnce && !hasFormChanged}
             >
-              {hasCalculatedOnce ? "🔄 Re-calculate" : "🚀 Calculate My Retirement"}
+              {loading
+                ? "Calculating..."
+                : hasCalculatedOnce
+                ? hasFormChanged
+                  ? "🔄 Re-calculate"
+                  : "✓ Up to date"
+                : "🚀 Calculate My Retirement"}
             </Button>
           </div>
         </div>
