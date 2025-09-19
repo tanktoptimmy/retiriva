@@ -45,7 +45,6 @@ export function calculateStatePensionAge(dob: Date): PensionInfo {
 
   if (!rule) {
     // Default to 67 for anyone born outside our defined ranges
-    console.warn(`DOB outside supported range, defaulting to age 67. DOB: ${dob.toISOString()}`);
     const pensionAge = 67;
     const pensionDate = new Date(dob);
     pensionDate.setFullYear(dob.getFullYear() + pensionAge);
@@ -91,12 +90,14 @@ export function testStatePensionCalculations() {
     new Date("1990-05-20"), // Should be 67
   ];
 
-  console.log("State Pension Age Test Results:");
-  testCases.forEach((dob, index) => {
+  // Return test results instead of logging
+  return testCases.map((dob, index) => {
     const result = calculateStatePensionAge(dob);
-    console.log(`Test ${index + 1}: Born ${dob.toDateString()}`);
-    console.log(`  Pension Age: ${result.pensionAge} years`);
-    console.log(`  Pension Date: ${result.pensionDate.toDateString()}`);
-    console.log();
+    return {
+      testNumber: index + 1,
+      dob: dob.toDateString(),
+      pensionAge: result.pensionAge,
+      pensionDate: result.pensionDate.toDateString()
+    };
   });
 }

@@ -22,11 +22,9 @@ const STORAGE_KEY = 'retirement-calculator-data';
 const loadFromStorage = (): SimpleRetirementInput | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    console.log('Raw localStorage string:', stored);
     if (!stored) return null;
     
     const data = JSON.parse(stored);
-    console.log('Parsed localStorage data:', data);
     // Convert string back to date
     if (data.dateOfBirth) {
       data.dateOfBirth = new Date(data.dateOfBirth);
@@ -72,16 +70,6 @@ export default function RetirementCalculator() {
           adjustSavingsForInflation: savedData.adjustSavingsForInflation ?? true,
         };
         
-        console.log('=== AUTO-CALCULATION DEBUG ===');
-        console.log('Raw saved data:', savedData);
-        console.log('Raw saved data - dailyExpenseAmount:', savedData.dailyExpenseAmount, typeof savedData.dailyExpenseAmount);
-        console.log('Raw saved data - workingDaysPerWeek:', savedData.workingDaysPerWeek, typeof savedData.workingDaysPerWeek);
-        console.log('Raw saved data - vacationDaysPerYear:', savedData.vacationDaysPerYear, typeof savedData.vacationDaysPerYear);
-        console.log('Processed data - dailyExpenseAmount:', processedData.dailyExpenseAmount);
-        console.log('Processed data - workingDaysPerWeek:', processedData.workingDaysPerWeek);
-        console.log('Processed data - vacationDaysPerYear:', processedData.vacationDaysPerYear);
-        console.log('==============================');
-        
         const result = calculateSimpleRetirement(processedData);
         const comparison = compareCoffeeVsInvestment(processedData);
         
@@ -111,14 +99,6 @@ export default function RetirementCalculator() {
 
       const result = calculateSimpleRetirement(formData);
       const comparison = compareCoffeeVsInvestment(formData);
-      
-      // Debug logging for coffee comparison
-      console.log('=== COFFEE COMPARISON DEBUG ===');
-      console.log('dailyExpenseAmount:', formData.dailyExpenseAmount);
-      console.log('workingDaysPerWeek:', formData.workingDaysPerWeek);
-      console.log('vacationDaysPerYear:', formData.vacationDaysPerYear);
-      console.log('Coffee comparison result:', comparison);
-      console.log('===============================');
       
       setResults(result);
       setCoffeeComparison(comparison);

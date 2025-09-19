@@ -187,13 +187,6 @@ function simulateDailyUntilDeathOnce(
   const totalDays = daysBetween(today, deathDate);
   
   const dailyReturn = getDailyReturnFromAnnual(input.expectedReturn);
-  console.log('Daily Return Calculation:', {
-    expectedReturnPercent: input.expectedReturn,
-    dailyReturn: dailyReturn,
-    dailyReturnPercent: (dailyReturn * 100).toFixed(6) + '%',
-    annualCompoundCheck: Math.pow(1 + dailyReturn, 365) - 1
-  });
-  
   const annualInflation = input.inflationRate / 100;
   
   // Use regional pension configuration
@@ -358,8 +351,6 @@ function simulateDailyUntilDeathOnce(
 function findLatestRetirementDayOffset(
   input: SimpleRetirementInput
 ): { foundOffset: number | null; simForFound: ReturnType<typeof simulateDailyUntilDeathOnce> | null } {
-  console.log('\n### BINARY SEARCH FOR OPTIMAL RETIREMENT DATE ###');
-  
   const today = startOfDay(new Date());
   const birth = input.dateOfBirth;
   // Set death date to the end of the death age year (the day before they turn deathAge + 1)
@@ -368,25 +359,12 @@ function findLatestRetirementDayOffset(
   deathDate.setDate(deathDate.getDate() - 1);
   const totalDays = daysBetween(today, deathDate);
 
-  console.log('Binary Search Setup:', {
-    totalDays: totalDays,
-    totalYears: Math.round(totalDays / 365.25)
-  });
-
   // Check if retiring at the very end still leaves positive balance
-  console.log('Testing retirement at very end (offset=', totalDays, ')...');
   const finalSim = simulateDailyUntilDeathOnce(input, totalDays);
-  console.log('Final simulation result:', {
-    finalBalanceAtDeath: finalSim.finalBalanceAtDeath,
-    runOutDate: finalSim.firstRunOutDate
-  });
   
   if (finalSim.finalBalanceAtDeath < 0) {
-    console.log('❌ Cannot retire even at the very end - insufficient funds!');
     return { foundOffset: null, simForFound: null };
   }
-  
-  console.log('✅ Can retire at the very end, starting binary search...');
 
   // Binary search to find the LATEST retirement date where balance is still >= -50000
   // (allowing some negative balance but not complete depletion)
@@ -394,30 +372,22 @@ function findLatestRetirementDayOffset(
   let hi = totalDays;
   let foundOffset: number | null = null;
   let bestSim: ReturnType<typeof simulateDailyUntilDeathOnce> | null = null;
-  let iteration = 0;
 
-  console.log('Starting main binary search (target: balance between -50k and 50k)...');
   while (lo <= hi) {
-    iteration++;
     const mid = Math.floor((lo + hi) / 2);
     const sim = simulateDailyUntilDeathOnce(input, mid);
-    
-    console.log(`Iteration ${iteration}: offset=${mid} days (${Math.round(mid/365.25)}y), balance=${sim.finalBalanceAtDeath.toFixed(2)}, lo=${lo}, hi=${hi}`);
     
     // Accept if balance is between -50000 and 50000 (close to zero)
     if (sim.finalBalanceAtDeath >= -50000 && sim.finalBalanceAtDeath <= 50000) {
       foundOffset = mid;
       bestSim = sim;
-      console.log(`  ✅ ACCEPTED: Balance ${sim.finalBalanceAtDeath.toFixed(2)} is in target range [-50k, 50k]`);
       // Try to find an even later retirement date (smaller offset = later retirement)
       hi = mid - 1;
     } else if (sim.finalBalanceAtDeath > 50000) {
       // Too much money left, can retire later (reduce offset)
-      console.log(`  📈 Too much money left (${sim.finalBalanceAtDeath.toFixed(2)}), can retire later`);
       hi = mid - 1;
     } else {
       // Too negative, need to retire earlier (increase offset)
-      console.log(`  📉 Too negative (${sim.finalBalanceAtDeath.toFixed(2)}), need to retire earlier`);
       lo = mid + 1;
     }
   }
@@ -451,55 +421,17 @@ function findLatestRetirementDayOffset(
 
 // ------------------- Public API -------------------
 export function calculateSimpleRetirement(input: SimpleRetirementInput): SimpleRetirementResult {
-  console.log('=== RETIREMENT CALCULATION STARTED ===');
-  console.log('Form Data Input:', {
-    dateOfBirth: input.dateOfBirth,
-    region: input.region,
-    currentSavings: input.currentSavings,
-    monthlySavings: input.monthlySavings,
-    savingsStopAge: input.savingsStopAge,
-    deathAge: input.deathAge,
-    desiredAnnualIncome: input.desiredAnnualIncome,
-    inflationRate: input.inflationRate,
-    expectedReturn: input.expectedReturn,
-    statePensionAge: input.statePensionAge,
-    statePensionAnnual: input.statePensionAnnual,
-    statePensionPercentage: input.statePensionPercentage,
-    adjustSavingsForInflation: input.adjustSavingsForInflation
-  });
-  
   const today = startOfDay(new Date());
   const birth = input.dateOfBirth;
   const currentAge = calculateAge(birth, today);
-  
-  console.log('Dates & Age:', {
-    today: today,
-    birth: birth,
-    currentAge: currentAge
-  });
   
   // Set death date to the end of the death age year (the day before they turn deathAge + 1)
   const deathDate = new Date(birth);
   deathDate.setFullYear(birth.getFullYear() + input.deathAge + 1);
   deathDate.setDate(deathDate.getDate() - 1);
   const totalDays = daysBetween(today, deathDate);
-  
-  console.log('Death Planning:', {
-    deathDate: deathDate,
-    totalDays: totalDays,
-    yearsUntilDeath: Math.round(totalDays / 365.25)
-  });
 
-  console.log('\n--- STARTING RETIREMENT DATE SEARCH ---');
   const { foundOffset, simForFound } = findLatestRetirementDayOffset(input);
-  
-  console.log('Search Results:', {
-    foundOffset: foundOffset,
-    foundOffsetDays: foundOffset,
-    foundOffsetYears: foundOffset ? Math.round(foundOffset / 365.25) : null,
-    finalBalance: simForFound?.finalBalanceAtDeath,
-    firstRunOutDate: simForFound?.firstRunOutDate
-  });
 
   // Build scenarios list
   const offsetsToShow = new Set<number>();
@@ -575,9 +507,6 @@ export function compareCoffeeVsInvestment(
   
   // If daily expense is 0, still show analysis but it will show no impact
   if (input.dailyExpenseAmount === 0) {
-    console.log('=== COFFEE VS INVESTMENT ANALYSIS START (zero expense) ===');
-    console.log('Daily expense is 0 - will show no impact analysis');
-    
     // Calculate once since both scenarios are identical
     const baseResult = calculateSimpleRetirement(input);
     
@@ -595,16 +524,8 @@ export function compareCoffeeVsInvestment(
     };
   }
 
-  console.log('=== COFFEE VS INVESTMENT ANALYSIS START ===');
-  console.log('Input daily expense:', input.dailyExpenseAmount);
-  console.log('Working days per week:', input.workingDaysPerWeek);
-  console.log('Vacation days per year:', input.vacationDaysPerYear);
-
   // Calculate scenario with coffee expenses
-  console.log('\n--- Calculating WITH coffee scenario ---');
   const withCoffee = calculateSimpleRetirement(input);
-  console.log('With coffee - Retirement age:', withCoffee.canRetireAt);
-  console.log('With coffee - Total savings at retirement:', withCoffee.totalSavingsAtRetirement);
   
   // Calculate scenario without coffee expenses (invested instead)
   const inputWithoutCoffee: SimpleRetirementInput = {
@@ -612,11 +533,7 @@ export function compareCoffeeVsInvestment(
     dailyExpenseAmount: -input.dailyExpenseAmount, // Negative means investment
     workingDaysPerWeek: input.workingDaysPerWeek,
   };
-  console.log('\n--- Calculating WITHOUT coffee scenario (investing instead) ---');
-  console.log('Modified daily expense amount (negative = investment):', inputWithoutCoffee.dailyExpenseAmount);
   const withoutCoffee = calculateSimpleRetirement(inputWithoutCoffee);
-  console.log('Without coffee - Retirement age:', withoutCoffee.canRetireAt);
-  console.log('Without coffee - Total savings at retirement:', withoutCoffee.totalSavingsAtRetirement);
   
   // Calculate the impact
   const today = startOfDay(new Date());
@@ -630,22 +547,10 @@ export function compareCoffeeVsInvestment(
   const actualAnnualExpenseDays = Math.max(0, baseAnnualExpenseDays - vacationDays);
   const annualCoffeeSpending = dailyExpense * actualAnnualExpenseDays;
   
-  console.log('\n--- Expense calculations ---');
-  console.log('Working days per week:', workingDaysPerWeek);
-  console.log('Vacation days per year:', vacationDays);
-  console.log('Base annual expense days:', baseAnnualExpenseDays);
-  console.log('Actual annual expense days:', actualAnnualExpenseDays);
-  console.log('Annual coffee spending:', annualCoffeeSpending);
-  
   // Calculate years of coffee spending (until retirement age with coffee or savings stop age)
   const retirementAge = withCoffee.canRetireAt ?? input.savingsStopAge;
   const yearsOfCoffeeSpending = Math.max(0, retirementAge - currentAge);
   const totalCoffeeSpendingUntilRetirement = annualCoffeeSpending * yearsOfCoffeeSpending;
-  
-  console.log('Current age:', currentAge);
-  console.log('Retirement age for calculations:', retirementAge);
-  console.log('Years of coffee spending:', yearsOfCoffeeSpending);
-  console.log('Total coffee spending until retirement:', totalCoffeeSpendingUntilRetirement);
   
   // Calculate improvements (without coffee should allow earlier retirement)
   // If withCoffee.canRetireAt = 67 and withoutCoffee.canRetireAt = 66, improvement = 67 - 66 = 1 year
@@ -659,13 +564,6 @@ export function compareCoffeeVsInvestment(
     : 0;
   
   const totalSavingsImprovement = withoutCoffee.totalSavingsAtRetirement - withCoffee.totalSavingsAtRetirement;
-  
-  console.log('\n--- Impact calculations ---');
-  console.log('Retirement age improvement:', retirementAgeImprovement, 'years');
-  console.log('Retirement date improvement:', retirementDateImprovement, 'days');
-  console.log('Total savings improvement:', totalSavingsImprovement);
-  console.log('Raw calculation: WITHOUT coffee savings:', withoutCoffee.totalSavingsAtRetirement, '- WITH coffee savings:', withCoffee.totalSavingsAtRetirement);
-  console.log('=== COFFEE VS INVESTMENT ANALYSIS END ===\n');
   
   return {
     withCoffee,
