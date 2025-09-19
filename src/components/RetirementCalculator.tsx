@@ -42,6 +42,7 @@ export default function RetirementCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasCalculatedOnce, setHasCalculatedOnce] = useState(false);
+  const [justCalculated, setJustCalculated] = useState(false);
 
   // Auto-calculate on mount if saved data exists
   useEffect(() => {
@@ -63,10 +64,15 @@ export default function RetirementCalculator() {
     }
   }, []);
 
-  const handleSubmit = (formData: SimpleRetirementInput) => {
+  const handleSubmit = async (formData: SimpleRetirementInput) => {
     try {
       setLoading(true);
       setError(null);
+      setJustCalculated(false);
+
+      // Add a brief delay to make the calculation feel more substantial
+      // and give time for the loading animation to be visible
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       const result = calculateSimpleRetirement(formData);
       const comparison = compareCoffeeVsInvestment(formData);
@@ -82,6 +88,11 @@ export default function RetirementCalculator() {
       setResults(result);
       setCoffeeComparison(comparison);
       setHasCalculatedOnce(true);
+      setJustCalculated(true);
+      
+      // Clear the "just calculated" state after a few seconds
+      setTimeout(() => setJustCalculated(false), 3000);
+      
     } catch (err) {
       console.error("Calculation error:", err);
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -105,6 +116,7 @@ export default function RetirementCalculator() {
         onSubmit={handleSubmit} 
         hasCalculatedOnce={hasCalculatedOnce}
         onRegionChange={handleRegionChange}
+        loading={loading}
       />
 
       {loading && (
@@ -113,6 +125,27 @@ export default function RetirementCalculator() {
 
       {error && (
         <ErrorMessage error={error} />
+      )}
+
+      {/* Success notification */}
+      {justCalculated && (
+        <div className="p-4 rounded-lg bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                ✨ Calculation completed successfully!
+              </p>
+              <p className="text-xs text-green-600 dark:text-green-300">
+                Your retirement projections have been updated below.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       {results && (
