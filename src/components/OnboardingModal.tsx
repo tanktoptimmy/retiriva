@@ -172,9 +172,9 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 h-[80vh] flex flex-col">
+        {/* Header - Fixed */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {steps[currentStep].title}
@@ -204,13 +204,13 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6">
           {steps[currentStep].content}
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center p-6 border-t border-gray-200 dark:border-gray-700">
+        {/* Footer - Fixed */}
+        <div className="flex justify-between items-center p-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
