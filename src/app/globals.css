@@ -9,6 +9,18 @@
   --font-sans: "Inter", "system-ui", "sans-serif";
 }
 
-/* Let Tailwind handle the theming */
+/* Set dark mode as default to prevent flash */
+html {
+  color-scheme: dark;
+  background-color: #111827; /* dark gray-900 */
+  color: #f3f4f6; /* gray-100 */
+}
 
-/* Remove the body styles since we're handling them in the layout */
+/* Override with light mode when explicitly set */
+html.light {
+  color-scheme: light;
+  background-color: #f9fafb; /* gray-50 */
+  color: #111827; /* gray-900 */
+}
+
+/* Let Tailwind handle the rest of the theming */
