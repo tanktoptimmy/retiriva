@@ -46,8 +46,8 @@ export default function RetirementFormProgressive({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="rounded-lg shadow-lg transition-colors bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-        <div className="p-6">
+      <form onSubmit={handleSubmit} className="sm:rounded-lg sm:shadow-lg transition-colors bg-gray-50 sm:bg-white sm:border border-gray-200 dark:bg-gray-900 sm:dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-3 sm:p-6">
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
               Retirement Calculator
@@ -59,8 +59,8 @@ export default function RetirementFormProgressive({
 
           <div className="space-y-6">
             {/* Essential Fields */}
-            <div className="p-4 rounded-lg bg-white border border-gray-100 dark:bg-gray-800/50 dark:border-gray-700">
-              <h3 className="font-semibold text-lg mb-4 text-gray-900 dark:text-gray-100">
+            <div className="p-2 sm:p-4 sm:rounded-lg bg-white sm:border border-gray-200 dark:bg-gray-800/70 dark:border-gray-600">
+              <h3 className="font-semibold text-lg mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">
                 Essential Information
               </h3>
               <EssentialFieldsSection

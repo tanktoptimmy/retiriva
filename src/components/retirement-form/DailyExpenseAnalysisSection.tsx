@@ -26,7 +26,7 @@ export const DailyExpenseAnalysisSection = ({
       defaultOpen={true}
     >
       <div className="md:col-span-2">
-        <div className="p-4 rounded-lg border-2 border-dashed transition-colors border-orange-300 bg-orange-50 dark:border-orange-600/50 dark:bg-orange-900/10">
+        <div className="p-3 sm:p-4 rounded-lg border-2 border-dashed transition-colors border-orange-300 bg-orange-50 dark:border-orange-600/50 dark:bg-orange-900/10">
           <p className="text-sm mb-4 text-orange-700 dark:text-orange-300">
             See how redirecting daily expenses like coffee into investments
             could change your retirement date!

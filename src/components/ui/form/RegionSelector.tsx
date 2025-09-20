@@ -32,7 +32,7 @@ export const RegionSelector = ({ value, onChange }: RegionSelectorProps) => {
               : "bg-white hover:bg-gray-50 border-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-100"
           }`}
         >
-          🇬🇧 United Kingdom
+          🇬🇧 UK
         </button>
         <button
           type="button"
@@ -43,7 +43,7 @@ export const RegionSelector = ({ value, onChange }: RegionSelectorProps) => {
               : "bg-white hover:bg-gray-50 border-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-100"
           }`}
         >
-          🇺🇸 United States
+          🇺🇸 US
         </button>
       </div>
       <div className="text-xs mt-2 text-gray-600 dark:text-gray-400">

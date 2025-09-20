@@ -73,6 +73,9 @@ export const StatePensionSection = ({
           }
 
           if (calculatedInfo && formValues.region === "UK") {
+            const percentage = formValues.statePensionPercentage ?? 100;
+            const calculatedAmount = Math.round((currentRegionConfig.statePensionAmount * percentage) / 100);
+            
             return (
               <>
                 <div
@@ -84,7 +87,7 @@ export const StatePensionSection = ({
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {currentRegionConfig.currency}
-                      {currentRegionConfig.statePensionAmount.toLocaleString()}
+                      {calculatedAmount.toLocaleString()}
                       /year
                     </span>
                   </div>

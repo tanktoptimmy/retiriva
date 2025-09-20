@@ -41,13 +41,13 @@ export const PercentageSlider = ({
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="flex-grow min-w-0 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          className="flex-grow min-w-0 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
         />
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0 w-24">
           <Input
             type="text"
             value={getDisplayValue(fieldName, value)}
-            className="w-16 text-center"
+            className="text-sm"
             placeholder={max.toString()}
             onChange={(e) => {
               const numValue = Number(e.target.value);

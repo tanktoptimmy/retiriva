@@ -21,7 +21,7 @@ export const EssentialFieldsSection = ({
   defaultDateOfBirth,
 }: EssentialFieldsSectionProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 sm:space-y-6">
       {/* Region Selection */}
       <Controller
         name="region"
@@ -46,7 +46,7 @@ export const EssentialFieldsSection = ({
           }
 
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col p-3 sm:p-4 rounded-lg bg-white/60 sm:bg-transparent border border-gray-100 sm:border-transparent dark:bg-gray-800/30 sm:dark:bg-transparent dark:border-gray-700 sm:dark:border-transparent">
               <div className="flex items-center gap-2 mb-1">
                 <label className="font-medium">Date of Birth</label>
                 <Tooltip
@@ -117,7 +117,7 @@ export const EssentialFieldsSection = ({
           );
 
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col p-3 sm:p-4 rounded-lg bg-white/60 sm:bg-transparent border border-gray-100 sm:border-transparent dark:bg-gray-800/30 sm:dark:bg-transparent dark:border-gray-700 sm:dark:border-transparent">
               <div className="flex items-center gap-2 mb-1">
                 <label className="font-medium">
                   Current{" "}
@@ -163,7 +163,7 @@ export const EssentialFieldsSection = ({
           );
 
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col p-3 sm:p-4 rounded-lg bg-white/60 sm:bg-transparent border border-gray-100 sm:border-transparent dark:bg-gray-800/30 sm:dark:bg-transparent dark:border-gray-700 sm:dark:border-transparent">
               <div className="flex items-center gap-2 mb-1">
                 <label className="font-medium">
                   Monthly Savings ({currentRegionConfig.currency})
@@ -207,7 +207,7 @@ export const EssentialFieldsSection = ({
           );
 
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col p-3 sm:p-4 rounded-lg bg-white/60 sm:bg-transparent border border-gray-100 sm:border-transparent dark:bg-gray-800/30 sm:dark:bg-transparent dark:border-gray-700 sm:dark:border-transparent">
               <div className="flex items-center gap-2 mb-1">
                 <label className="font-medium">
                   Desired Annual Income in Retirement (
