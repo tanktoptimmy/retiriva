@@ -34,31 +34,43 @@ export default function RetirementCountdown({ retirementDate, retirementAge }: R
 
     const calculateTimeLeft = (): CountdownTime => {
       const now = new Date();
-      const difference = retirementDate.getTime() - now.getTime();
+      const target = new Date(retirementDate.getTime());
 
-      if (difference <= 0) {
+      if (target.getTime() <= now.getTime()) {
         return { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
       }
 
-      // Calculate years
-      const years = Math.floor(difference / (1000 * 60 * 60 * 24 * 365.25));
+      // Calculate years by comparing full years
+      let years = target.getFullYear() - now.getFullYear();
+      let tempDate = new Date(now.getFullYear() + years, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
       
-      // Calculate remaining time after years
-      const remainingAfterYears = difference - (years * 1000 * 60 * 60 * 24 * 365.25);
+      // If we've gone past the target date, subtract a year
+      if (tempDate.getTime() > target.getTime()) {
+        years--;
+        tempDate = new Date(now.getFullYear() + years, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+      }
+
+      // Calculate months
+      let months = 0;
+      while (true) {
+        const nextMonth = new Date(tempDate.getFullYear(), tempDate.getMonth() + months + 1, tempDate.getDate(), tempDate.getHours(), tempDate.getMinutes(), tempDate.getSeconds());
+        if (nextMonth.getTime() > target.getTime()) {
+          break;
+        }
+        months++;
+      }
       
-      // Calculate months (approximate)
-      const months = Math.floor(remainingAfterYears / (1000 * 60 * 60 * 24 * 30.44));
+      // Update temp date to include the months
+      tempDate = new Date(tempDate.getFullYear(), tempDate.getMonth() + months, tempDate.getDate(), tempDate.getHours(), tempDate.getMinutes(), tempDate.getSeconds());
       
-      // Calculate remaining time after months
-      const remainingAfterMonths = remainingAfterYears - (months * 1000 * 60 * 60 * 24 * 30.44);
+      // Calculate remaining time in milliseconds
+      const remainingMs = target.getTime() - tempDate.getTime();
       
-      // Calculate days
-      const days = Math.floor(remainingAfterMonths / (1000 * 60 * 60 * 24));
-      
-      // Calculate hours, minutes, seconds
-      const hours = Math.floor((remainingAfterMonths % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((remainingAfterMonths % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remainingAfterMonths % (1000 * 60)) / 1000);
+      // Calculate days, hours, minutes, seconds from the remaining milliseconds
+      const days = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
 
       return { years, months, days, hours, minutes, seconds };
     };

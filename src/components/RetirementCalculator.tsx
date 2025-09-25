@@ -36,7 +36,11 @@ const loadFromStorage = (): SimpleRetirementInput | null => {
   }
 };
 
-export default function RetirementCalculator() {
+interface RetirementCalculatorProps {
+  onResultsUpdate?: (retirementDate: Date | null, retirementAge: number | null) => void;
+}
+
+export default function RetirementCalculator({ onResultsUpdate }: RetirementCalculatorProps = {}) {
   const [results, setResults] = useState<SimpleRetirementResult | null>(null);
   const [coffeeComparison, setCoffeeComparison] = useState<CoffeeVsInvestmentComparison | null>(null);
   const [loading, setLoading] = useState(false);
@@ -76,6 +80,11 @@ export default function RetirementCalculator() {
         setResults(result);
         setCoffeeComparison(comparison);
         setHasCalculatedOnce(true);
+        
+        // Notify parent about updated results
+        if (onResultsUpdate) {
+          onResultsUpdate(result.retirementDate, result.canRetireAt);
+        }
         } catch (err) {
           console.error("Auto-calculation error:", err);
           // Don't set error state for auto-calculation failures
@@ -85,7 +94,7 @@ export default function RetirementCalculator() {
     }, 1000); // Wait 1 second for form to stabilize
     
     return () => clearTimeout(timer);
-  }, []);
+  }, [onResultsUpdate]);
 
   const handleSubmit = async (formData: SimpleRetirementInput) => {
     try {
@@ -104,6 +113,11 @@ export default function RetirementCalculator() {
       setCoffeeComparison(comparison);
       setHasCalculatedOnce(true);
       setJustCalculated(true);
+      
+      // Notify parent about updated results
+      if (onResultsUpdate) {
+        onResultsUpdate(result.retirementDate, result.canRetireAt);
+      }
       
       // Clear the "just calculated" state after a few seconds
       setTimeout(() => setJustCalculated(false), 3000);

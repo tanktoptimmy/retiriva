@@ -5,31 +5,10 @@ import RetirementCalculator from "@/components/RetirementCalculator";
 import RetirementCountdown from "@/components/RetirementCountdown";
 import HeroSectionSimplified from "@/components/HeroSectionSimplified";
 import OnboardingModal from "@/components/OnboardingModal";
-import {
-  calculateSimpleRetirement,
-  SimpleRetirementInput,
-} from "@/utils/retirementEngine";
-
-// Helper functions for localStorage access
-const STORAGE_KEY = "retirement-calculator-data";
+import AffiliateRecommendations from "@/components/AffiliateRecommendations";
+import AffiliateBanner from "@/components/AffiliateBanner";
+// Helper constants
 const ONBOARDING_KEY = "retirement-calculator-onboarding-seen";
-
-const loadFromStorage = (): SimpleRetirementInput | null => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-
-    const data = JSON.parse(stored);
-    // Convert string back to date
-    if (data.dateOfBirth) {
-      data.dateOfBirth = new Date(data.dateOfBirth);
-    }
-    return data;
-  } catch (error) {
-    console.warn("Could not load from localStorage:", error);
-    return null;
-  }
-};
 
 function Disclaimer() {
   return (
@@ -61,7 +40,7 @@ export default function HomePage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(true); // Start as true to avoid flash
 
-  // Load saved retirement data and check onboarding status on mount
+  // Load onboarding status on mount
   useEffect(() => {
     setIsClient(true);
     
@@ -73,26 +52,19 @@ export default function HomePage() {
     } else {
       setHasSeenOnboarding(true);
     }
-    
-    // Load saved retirement data
-    const savedData = loadFromStorage();
-    if (savedData) {
-      try {
-        const result = calculateSimpleRetirement(savedData);
-        if (result.retirementDate && result.canRetireAt !== null) {
-          setSavedRetirementData({
-            retirementDate: result.retirementDate,
-            retirementAge: result.canRetireAt,
-          });
-        }
-      } catch (error) {
-        console.warn(
-          "Could not calculate retirement data for countdown:",
-          error
-        );
-      }
-    }
   }, []);
+  
+  // Handle updates from the calculator
+  const handleCalculatorUpdate = (retirementDate: Date | null, retirementAge: number | null) => {
+    if (retirementDate && retirementAge !== null) {
+      setSavedRetirementData({
+        retirementDate,
+        retirementAge,
+      });
+    } else {
+      setSavedRetirementData(null);
+    }
+  };
   
   const handleCloseOnboarding = () => {
     setShowOnboarding(false);
@@ -120,9 +92,40 @@ export default function HomePage() {
       <HeroSectionSimplified onLearnMoreClick={handleShowOnboarding} />
 
       {/* Retirement Calculator - Now more prominent */}
-      <RetirementCalculator />
+      <RetirementCalculator onResultsUpdate={handleCalculatorUpdate} />
+      
+      {/* Compact affiliate banner after calculator */}
+      <AffiliateBanner 
+        variant="compact"
+        product={{
+          name: "High-Yield Savings Account",
+          description: "Build your emergency fund with 4.5% APY. FDIC insured, no minimums.",
+          cta: "Open Account",
+          url: "https://example-bank.com/savings/ref=retiriva",
+          badge: "4.5% APY"
+        }}
+      />
       
       <Disclaimer />
+      
+      {/* Featured affiliate recommendation */}
+      <div className="mt-12">
+        <AffiliateBanner 
+          variant="featured"
+          product={{
+            name: "Start Investing Today",
+            description: "Commission-free stock trades and low-cost index funds. Perfect for building your retirement portfolio.",
+            cta: "Get Started Free",
+            url: "https://example-investment-platform.com/ref=retiriva",
+            badge: "Most Popular"
+          }}
+        />
+      </div>
+      
+      {/* Full affiliate recommendations section */}
+      <div className="mt-16 mb-12">
+        <AffiliateRecommendations maxItems={6} />
+      </div>
       
       {/* Onboarding Modal */}
       <OnboardingModal 
